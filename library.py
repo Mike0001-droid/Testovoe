@@ -1,7 +1,14 @@
 import json
 
 class Book:
-    def __init__(self, id, title, author, year, status="в наличии"):
+    def __init__(
+        self, 
+        id: int, 
+        title: str, 
+        author: str, 
+        year: str, 
+        status="в наличии"
+    ):
         self.id = id
         self.title = title
         self.author = author
@@ -36,14 +43,14 @@ class Library:
         with open(self.DATA_FILE, "w", encoding="utf-8") as file:
             json.dump([book.to_dict() for book in self.books], file, indent=4, ensure_ascii=False)
 
-    def add_book(self, title, author, year):
+    def add_book(self, title: str, author: str, year: str):
         new_id = max([book.id for book in self.books], default=0) + 1
         new_book = Book(new_id, title, author, year)
         self.books.append(new_book)
         self.save_books()
         print(f"Книга '{title}' успешно добавлена с ID {new_id}")
 
-    def delete_book(self, book_id):
+    def delete_book(self, book_id: int):
         book = next((book for book in self.books if book.id == book_id), None)
         if not book:
             print("Книга с таким ID не найдена")
@@ -52,7 +59,7 @@ class Library:
         self.save_books()
         print(f"Книга с ID {book_id} успешно удалена")
 
-    def search_books(self, query, field):
+    def search_books(self, query: str, field: str):
         if field not in ["title", "author", "year"]:
             print("Некорректное поле для поиска")
             return
@@ -70,7 +77,7 @@ class Library:
             for book in self.books:
                 print(f"ID: {book.id}, Название: {book.title}, Автор: {book.author}, Год: {book.year}, Статус: {book.status}")
 
-    def update_status(self, book_id, new_status):
+    def update_status(self, book_id: int, new_status: str):
         if new_status not in ["в наличии", "выдана"]:
             print("Некорректный статус. Выберите 'в наличии' или 'выдана'")
             return
