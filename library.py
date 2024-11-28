@@ -34,28 +34,38 @@ class Library:
     def load_books(self):
         try:
             with open(self.DATA_FILE, "r", encoding="utf-8") as file:
+                #преобразует содержимое файла в JSON - объекты
                 data = json.load(file)
+                #создание экземпляров класса Book(), на основе данных из файла
                 return [Book(**book) for book in data]
         except (FileNotFoundError, json.JSONDecodeError):
             return []
 
     def save_books(self):
         with open(self.DATA_FILE, "w", encoding="utf-8") as file:
+            #записывает объекты класса Book() в формате JSON
             json.dump([book.to_dict() for book in self.books], file, indent=4, ensure_ascii=False)
 
     def add_book(self, title: str, author: str, year: str):
+        #выборка максимального id среди имеющихся для создания нового id
         new_id = max([book.id for book in self.books], default=0) + 1
+        #создание нового экземпляра
         new_book = Book(new_id, title, author, year)
+        #добавление экземпляра в файл
         self.books.append(new_book)
+        #сохранение состояния библиотеки
         self.save_books()
         print(f"Книга '{title}' успешно добавлена с ID {new_id}")
 
     def delete_book(self, book_id: int):
+        #извлекает книгу в зависимости от переданного id 
         book = next((book for book in self.books if book.id == book_id), None)
         if not book:
             print("Книга с таким ID не найдена")
             return
+        #удаление книги из списка всех книг
         self.books.remove(book)
+        #сохранение состояния библиотеки
         self.save_books()
         print(f"Книга с ID {book_id} успешно удалена")
 
@@ -63,7 +73,9 @@ class Library:
         if field not in ["title", "author", "year"]:
             print("Некорректное поле для поиска")
             return
+        #извлечение объектов "Книга" в зависимости от переданного поля поиска и значения
         results = [book for book in self.books if str(getattr(book, field)).lower() == str(query).lower()]
+
         if results:
             for book in results:
                 print(f"ID: {book.id}, Название: {book.title}, Автор: {book.author}, Год: {book.year}, Статус: {book.status}")
@@ -75,17 +87,21 @@ class Library:
             print("Библиотека пуста.")
         else:
             for book in self.books:
-                print(f"ID: {book.id}, Название: {book.title}, Автор: {book.author}, Год: {book.year}, Статус: {book.status}")
+                if book.status == 'в наличии':
+                    print(f"ID: {book.id}, Название: {book.title}, Автор: {book.author}, Год: {book.year}, Статус: {book.status}")
 
     def update_status(self, book_id: int, new_status: str):
         if new_status not in ["в наличии", "выдана"]:
             print("Некорректный статус. Выберите 'в наличии' или 'выдана'")
             return
+        #извлекает книгу в зависимости от переданного id 
         book = next((book for book in self.books if book.id == book_id), None)
         if not book:
             print("Книга с таким ID не найдена")
             return
+        #присваивание нового статуса найденной книге 
         book.status = new_status
+        #сохранение состояния библиотеки
         self.save_books()
         print(f"Статус книги с ID {book_id} успешно обновлен на '{new_status}'")
 
